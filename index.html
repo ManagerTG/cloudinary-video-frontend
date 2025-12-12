@@ -60,7 +60,6 @@
     }
     main { display: flex; min-height: 420px; }
 
-    /* Sidebar tabs */
     .sidebar {
       width: 150px;
       border-right: 1px solid #111827;
@@ -90,7 +89,6 @@
       color: var(--text);
     }
 
-    /* Content area */
     .content {
       flex: 1;
       padding: 14px 16px 16px;
@@ -243,7 +241,6 @@
       object-fit: cover;
     }
 
-    /* Lock view */
     #lockView {
       padding: 22px 18px 26px;
       text-align: center;
@@ -275,16 +272,14 @@
       </p>
     </div>
 
-    <!-- App main UI -->
+    <!-- App UI -->
     <main id="appView" class="hidden">
-      <!-- Sidebar tabs -->
       <div class="sidebar">
         <button class="tab-btn active" data-tab="uploadTab">⬆ Upload</button>
         <button class="tab-btn" data-tab="usageTab">📊 Usage</button>
         <button class="tab-btn" data-tab="manageTab">🗂 Manage</button>
       </div>
 
-      <!-- Content panels -->
       <div class="content">
         <!-- Upload tab -->
         <section id="uploadTab">
@@ -370,7 +365,7 @@
     const CLOUD_NAME = "dfnvpi7nh";
     const UPLOAD_PRESET = "telegram_upload";
     const BACKEND_BASE_URL = "https://cloudinary-video-backend.onrender.com";
-    const ACCESS_CODE = "3807"; // change to any code you like
+    const ACCESS_CODE = "3807"; // change if you want
     const UNLOCK_HOURS = 24;
     const STORAGE_LIMIT_GB = 25;
     // ====================
@@ -424,7 +419,7 @@
 
     updateAuthView();
 
-    // ====== Upload tab ======
+    // Upload tab
     const fileInput = document.getElementById("fileInput");
     const uploadBtn = document.getElementById("uploadBtn");
     const statsBtn  = document.getElementById("statsBtn");
@@ -460,7 +455,6 @@
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", UPLOAD_PRESET);
-      // folder is controlled by preset (Reels)
       statusText.textContent = `Uploading ${index + 1} of ${total}: ${file.name}`;
 
       try {
@@ -534,7 +528,7 @@
       }
     });
 
-    // ====== Tabs ======
+    // Tabs
     const tabButtons = document.querySelectorAll(".tab-btn");
     const tabs = {
       uploadTab: document.getElementById("uploadTab"),
@@ -552,7 +546,7 @@
       });
     });
 
-    // ====== Usage tab ======
+    // Usage tab
     const refreshUsageBtn = document.getElementById("refreshUsageBtn");
     const usageText = document.getElementById("usageText");
     const usageFill = document.getElementById("usageFill");
@@ -578,7 +572,7 @@
       }
     });
 
-    // ====== Manage tab ======
+    // Manage tab
     const videosBody = document.getElementById("videosBody");
     const reloadVideosBtn = document.getElementById("reloadVideosBtn");
     const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
@@ -650,7 +644,6 @@
         if (data.error) {
           alert("Delete failed: " + data.error);
         } else {
-          // Remove deleted rows from table
           chks.forEach(c => c.closest("tr").remove());
         }
       } catch (e) {
