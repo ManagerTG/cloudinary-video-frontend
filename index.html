@@ -187,10 +187,10 @@
   </div>
 
   <script>
-    // CONFIG – EDIT THESE 3 VALUES
-    const CLOUD_NAME = "dfnvpi7nh";          // your cloud name
-    const UPLOAD_PRESET = "telegram_upload"; // unsigned preset
-    const BACKEND_BASE_URL = "https://YOUR-BACKEND.onrender.com"; // after backend deploy
+    // FINAL CONFIG FOR YOUR PROJECT
+    const CLOUD_NAME = "dfnvpi7nh";          // your cloud
+    const UPLOAD_PRESET = "telegram_upload"; // your UNSIGNED preset
+    const BACKEND_BASE_URL = "https://cloudinary-video-backend.onrender.com";
 
     const fileInput = document.getElementById("fileInput");
     const uploadBtn = document.getElementById("uploadBtn");
@@ -286,8 +286,8 @@
     });
 
     statsBtn.addEventListener("click", async () => {
-      if (!BACKEND_BASE_URL || BACKEND_BASE_URL.includes("YOUR-BACKEND")) {
-        alert("Deploy backend and set BACKEND_BASE_URL first.");
+      if (!BACKEND_BASE_URL) {
+        alert("BACKEND_BASE_URL is not set.");
         return;
       }
       statsBtn.disabled = true;
