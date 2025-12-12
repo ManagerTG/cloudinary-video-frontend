@@ -2,99 +2,156 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Cloudinary Video Uploader</title>
+  <title>Cloudinary Video Manager</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root {
+      --bg: #020617;
+      --panel: #020617;
+      --border: #1f2937;
+      --accent: #22c55e;
+      --accent-dark: #16a34a;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f97373;
+    }
+    * { box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #020617;
-      color: #e5e7eb;
+      background: radial-gradient(circle at top, #0f172a 0, #020617 55%, #000 100%);
+      color: var(--text);
       margin: 0;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 12px;
     }
-    .card {
+    .shell {
       width: 100%;
-      max-width: 520px;
+      max-width: 900px;
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 20px;
+      border: 1px solid #111827;
+      box-shadow: 0 24px 65px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+    }
+    header {
+      padding: 12px 18px;
+      border-bottom: 1px solid #111827;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      font-size: 1.05rem;
+      margin: 0;
+    }
+    header span {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+    .chip {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: #0f172a;
+      color: var(--muted);
+    }
+    main { display: flex; min-height: 420px; }
+
+    /* Sidebar tabs */
+    .sidebar {
+      width: 150px;
+      border-right: 1px solid #111827;
       background: #020617;
-      border-radius: 18px;
-      padding: 20px 18px 22px;
-      border: 1px solid #1f2937;
-      box-shadow: 0 22px 55px rgba(15, 23, 42, 0.9);
-      box-sizing: border-box;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
-    h1 {
-      font-size: 1.25rem;
-      margin: 0 0 4px;
-      text-align: center;
-    }
-    .subtitle {
-      margin: 0 0 12px;
+    .tab-btn {
+      width: 100%;
+      padding: 8px 10px;
       font-size: 0.8rem;
-      text-align: center;
-      color: #9ca3af;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      gap: 6px;
+      align-items: center;
     }
+    .tab-btn.active {
+      background: #0b1120;
+      border-color: #1f2937;
+      color: var(--text);
+    }
+
+    /* Content area */
+    .content {
+      flex: 1;
+      padding: 14px 16px 16px;
+      background: #020617;
+    }
+    .hidden { display: none; }
+
     .row { margin-bottom: 10px; }
     label {
       font-size: 0.8rem;
-      color: #9ca3af;
+      color: var(--muted);
       display: block;
       margin-bottom: 4px;
     }
-    input[type="file"] {
+    input[type="file"], input[type="password"] {
       width: 100%;
       padding: 8px;
-      background: #020617;
       border-radius: 10px;
-      border: 1px solid #1f2937;
-      color: #e5e7eb;
+      border: 1px solid var(--border);
+      background: #020617;
+      color: var(--text);
       font-size: 0.9rem;
-      box-sizing: border-box;
-    }
-    .btn-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 6px;
     }
     .btn {
-      flex: 1;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      padding: 9px 10px;
+      padding: 8px 12px;
       border-radius: 999px;
       border: none;
       cursor: pointer;
-      font-size: 0.86rem;
+      font-size: 0.8rem;
       font-weight: 600;
       transition: transform 0.1s ease, box-shadow 0.15s ease, opacity 0.15s ease;
     }
     .btn-main {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
       color: #022c22;
-      box-shadow: 0 12px 32px rgba(22, 163, 74, 0.6);
+      box-shadow: 0 10px 28px rgba(34, 197, 94, 0.65);
     }
     .btn-secondary {
       background: #111827;
-      color: #e5e7eb;
-      border: 1px solid #1f2937;
+      color: var(--text);
+      border: 1px solid var(--border);
     }
-    .btn:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      box-shadow: none;
+    .btn-danger {
+      background: #7f1d1d;
+      color: #fee2e2;
+      border: 1px solid #b91c1c;
     }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
     .btn:not(:disabled):active { transform: translateY(1px) scale(0.99); }
+
     .status-box {
-      margin-top: 12px;
-      padding: 10px;
-      background: #020617;
+      margin-top: 8px;
+      padding: 9px;
       border-radius: 12px;
-      border: 1px solid #1f2937;
-      font-size: 0.8rem;
+      border: 1px solid var(--border);
+      background: #020617;
+      font-size: 0.78rem;
     }
     .status-top {
       display: flex;
@@ -107,91 +164,267 @@
       border-radius: 999px;
       font-size: 0.7rem;
       background: #0f172a;
-      color: #9ca3af;
+      color: var(--muted);
     }
     .progress {
-      margin-top: 6px;
       width: 100%;
       height: 6px;
       border-radius: 999px;
       background: #020617;
       overflow: hidden;
+      margin-top: 6px;
     }
     .progress-bar {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #22c55e, #16a34a);
+      background: linear-gradient(90deg, var(--accent), var(--accent-dark));
       transition: width 0.2s ease-out;
     }
+
+    .usage-bar {
+      margin-top: 6px;
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #020617;
+      overflow: hidden;
+      border: 1px solid #1f2937;
+    }
+    .usage-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #22c55e);
+      transition: width 0.25s ease-out;
+    }
+
     .log {
       margin-top: 10px;
-      max-height: 260px;
+      max-height: 210px;
       overflow-y: auto;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       border-top: 1px solid #111827;
-      padding-top: 8px;
+      padding-top: 6px;
     }
     .log-item {
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       padding-bottom: 4px;
       border-bottom: 1px dashed #1f2937;
     }
-    .log-item:last-child { border-bottom: none; }
     .log-url {
       word-break: break-all;
       color: #38bdf8;
       text-decoration: none;
     }
     .log-url:hover { text-decoration: underline; }
-    .small {
-      font-size: 0.72rem;
-      color: #6b7280;
-      margin-top: 6px;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+    th, td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #111827;
+      text-align: left;
+    }
+    th { color: var(--muted); font-weight: 500; }
+    tbody tr:nth-child(even) { background: #020617; }
+
+    .thumb {
+      width: 80px;
+      height: 45px;
+      background: #020617;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .thumb video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Lock view */
+    #lockView {
+      padding: 22px 18px 26px;
       text-align: center;
     }
+    #lockView h2 { margin: 0 0 6px; font-size: 1.05rem; }
+    #lockView p { margin: 0 0 14px; font-size: 0.78rem; color: var(--muted); }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Video Uploader</h1>
-    <p class="subtitle">Uploads videos from your phone to Cloudinary (25GB free plan).</p>
+  <div class="shell">
+    <header>
+      <div>
+        <h1>Cloud Video Dashboard</h1>
+        <span>Private uploader for Cloudinary (Reels folder, 25GB free)</span>
+      </div>
+      <span class="chip" id="authChip">Locked</span>
+    </header>
 
-    <div class="row">
-      <label for="fileInput">Choose one or more videos</label>
-      <input id="fileInput" type="file" accept="video/*" multiple />
+    <!-- Lock screen -->
+    <div id="lockView">
+      <h2>Enter Access Code</h2>
+      <p>This site is private. Enter your daily access code to continue.</p>
+      <div class="row">
+        <input id="accessInput" type="password" placeholder="Access code" />
+      </div>
+      <button id="unlockBtn" class="btn btn-main">Unlock</button>
+      <p style="margin-top:8px;font-size:0.72rem;color:#6b7280;">
+        You will stay unlocked for 24 hours on this device.
+      </p>
     </div>
 
-    <div class="btn-row">
-      <button id="uploadBtn" class="btn btn-main">⬆ Upload</button>
-      <button id="statsBtn" class="btn btn-secondary">📊 My uploads</button>
-    </div>
-
-    <div class="status-box">
-      <div class="status-top">
-        <span id="statusText">Idle. Select videos to start.</span>
-        <span id="counterBadge" class="badge">0 / 0</span>
+    <!-- App main UI -->
+    <main id="appView" class="hidden">
+      <!-- Sidebar tabs -->
+      <div class="sidebar">
+        <button class="tab-btn active" data-tab="uploadTab">⬆ Upload</button>
+        <button class="tab-btn" data-tab="usageTab">📊 Usage</button>
+        <button class="tab-btn" data-tab="manageTab">🗂 Manage</button>
       </div>
-      <div class="progress">
-        <div id="progressBar" class="progress-bar"></div>
-      </div>
-      <div class="small" id="globalCounterText">
-        Browser total uploaded: <span id="browserTotal">0</span> videos
-      </div>
-    </div>
 
-    <div class="log" id="log"></div>
+      <!-- Content panels -->
+      <div class="content">
+        <!-- Upload tab -->
+        <section id="uploadTab">
+          <div class="row">
+            <label for="fileInput">Select one or more videos</label>
+            <input id="fileInput" type="file" accept="video/*" multiple />
+          </div>
 
-    <p class="small">
-      Uses direct unsigned upload. Protect your preset with size/format limits in Cloudinary settings.
-    </p>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <button id="uploadBtn" class="btn btn-main" style="flex:2;">⬆ Upload</button>
+            <button id="statsBtn" class="btn btn-secondary" style="flex:1;">ℹ Stats</button>
+          </div>
+
+          <div class="status-box">
+            <div class="status-top">
+              <span id="statusText">Idle. Select videos to start.</span>
+              <span id="counterBadge" class="badge">0 / 0</span>
+            </div>
+            <div class="progress">
+              <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <div style="margin-top:4px;font-size:0.72rem;color:#6b7280;">
+              Browser total uploaded: <span id="browserTotal">0</span> videos
+            </div>
+          </div>
+
+          <div class="log" id="log"></div>
+        </section>
+
+        <!-- Usage tab -->
+        <section id="usageTab" class="hidden">
+          <h3 style="margin:0 0 6px;font-size:0.9rem;">Storage usage</h3>
+          <p style="margin:0 0 8px;font-size:0.78rem;color:#9ca3af;">
+            Shows approximate Cloudinary storage used out of your 25 GB target.
+          </p>
+          <button id="refreshUsageBtn" class="btn btn-secondary" style="margin-bottom:8px;">
+            🔄 Refresh usage
+          </button>
+          <div class="status-box">
+            <div class="status-top">
+              <span id="usageText">Usage not loaded yet.</span>
+            </div>
+            <div class="usage-bar">
+              <div id="usageFill" class="usage-fill"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Manage tab -->
+        <section id="manageTab" class="hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <h3 style="margin:0;font-size:0.9rem;">Manage videos in Reels</h3>
+            <button id="reloadVideosBtn" class="btn btn-secondary">🔄 Reload</button>
+          </div>
+          <p style="margin:0 0 6px;font-size:0.76rem;color:#9ca3af;">
+            Select videos and delete them from Cloudinary directly (this cannot be undone).
+          </p>
+
+          <div style="margin-bottom:6px;">
+            <button id="deleteSelectedBtn" class="btn btn-danger">🗑 Delete selected</button>
+          </div>
+
+          <div style="max-height:260px;overflow-y:auto;border:1px solid #111827;border-radius:10px;">
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="selectAllChk" /></th>
+                  <th>Preview</th>
+                  <th>Size</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody id="videosBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
   </div>
 
   <script>
-    // FINAL CONFIG FOR YOUR PROJECT
-    const CLOUD_NAME = "dfnvpi7nh";          // your cloud
-    const UPLOAD_PRESET = "telegram_upload"; // your UNSIGNED preset
+    // ====== CONFIG ======
+    const CLOUD_NAME = "dfnvpi7nh";
+    const UPLOAD_PRESET = "telegram_upload";
     const BACKEND_BASE_URL = "https://cloudinary-video-backend.onrender.com";
+    const ACCESS_CODE = "3807"; // change to any code you like
+    const UNLOCK_HOURS = 24;
+    const STORAGE_LIMIT_GB = 25;
+    // ====================
 
+    const lockView = document.getElementById("lockView");
+    const appView = document.getElementById("appView");
+    const accessInput = document.getElementById("accessInput");
+    const unlockBtn = document.getElementById("unlockBtn");
+    const authChip = document.getElementById("authChip");
+
+    function isUnlocked() {
+      const raw = localStorage.getItem("cvd_unlock");
+      if (!raw) return false;
+      try {
+        const obj = JSON.parse(raw);
+        const ts = obj.ts;
+        const diffH = (Date.now() - ts) / (1000 * 60 * 60);
+        return diffH < UNLOCK_HOURS;
+      } catch {
+        return false;
+      }
+    }
+
+    function setUnlocked() {
+      localStorage.setItem("cvd_unlock", JSON.stringify({ ts: Date.now() }));
+    }
+
+    function updateAuthView() {
+      if (isUnlocked()) {
+        lockView.classList.add("hidden");
+        appView.classList.remove("hidden");
+        authChip.textContent = "Unlocked";
+      } else {
+        lockView.classList.remove("hidden");
+        appView.classList.add("hidden");
+        authChip.textContent = "Locked";
+      }
+    }
+
+    unlockBtn.addEventListener("click", () => {
+      const val = accessInput.value.trim();
+      if (!val) return alert("Enter access code.");
+      if (val === ACCESS_CODE) {
+        setUnlocked();
+        updateAuthView();
+        accessInput.value = "";
+      } else {
+        alert("Wrong code.");
+      }
+    });
+
+    updateAuthView();
+
+    // ====== Upload tab ======
     const fileInput = document.getElementById("fileInput");
     const uploadBtn = document.getElementById("uploadBtn");
     const statsBtn  = document.getElementById("statsBtn");
@@ -202,12 +435,12 @@
     const browserTotalEl = document.getElementById("browserTotal");
     const globalCounterText = document.getElementById("globalCounterText");
 
-    const LS_KEY = "video_uploader_total";
-    let browserTotal = parseInt(localStorage.getItem(LS_KEY) || "0", 10);
+    const LS_TOTAL_KEY = "video_uploader_total";
+    let browserTotal = parseInt(localStorage.getItem(LS_TOTAL_KEY) || "0", 10);
     browserTotalEl.textContent = browserTotal;
 
     function saveBrowserTotal() {
-      localStorage.setItem(LS_KEY, String(browserTotal));
+      localStorage.setItem(LS_TOTAL_KEY, String(browserTotal));
       browserTotalEl.textContent = browserTotal;
     }
 
@@ -227,7 +460,7 @@
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", UPLOAD_PRESET);
-
+      // folder is controlled by preset (Reels)
       statusText.textContent = `Uploading ${index + 1} of ${total}: ${file.name}`;
 
       try {
@@ -286,12 +519,6 @@
     });
 
     statsBtn.addEventListener("click", async () => {
-      if (!BACKEND_BASE_URL) {
-        alert("BACKEND_BASE_URL is not set.");
-        return;
-      }
-      statsBtn.disabled = true;
-      statsBtn.textContent = "⏳ Loading...";
       try {
         const res = await fetch(`${BACKEND_BASE_URL}/stats`);
         const data = await res.json();
@@ -304,9 +531,134 @@
       } catch (e) {
         console.error(e);
         alert("Failed to load stats from backend.");
+      }
+    });
+
+    // ====== Tabs ======
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabs = {
+      uploadTab: document.getElementById("uploadTab"),
+      usageTab: document.getElementById("usageTab"),
+      manageTab: document.getElementById("manageTab")
+    };
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.tab;
+        Object.keys(tabs).forEach(k => {
+          tabs[k].classList.toggle("hidden", k !== target);
+        });
+        tabButtons.forEach(b => b.classList.toggle("active", b === btn));
+      });
+    });
+
+    // ====== Usage tab ======
+    const refreshUsageBtn = document.getElementById("refreshUsageBtn");
+    const usageText = document.getElementById("usageText");
+    const usageFill = document.getElementById("usageFill");
+
+    refreshUsageBtn.addEventListener("click", async () => {
+      refreshUsageBtn.disabled = true;
+      try {
+        const res = await fetch(`${BACKEND_BASE_URL}/usage`);
+        const data = await res.json();
+        const used = data.storageGB || 0;
+        const limit = data.limitGB || STORAGE_LIMIT_GB;
+        const percent = Math.min(100, (used / limit) * 100);
+        usageFill.style.width = `${percent.toFixed(1)}%`;
+        const left = Math.max(0, limit - used);
+        usageText.textContent =
+          `Used ${used.toFixed(2)} GB of ${limit} GB (${percent.toFixed(1)}%). ` +
+          `Approx left: ${left.toFixed(2)} GB.`;
+      } catch (e) {
+        console.error(e);
+        alert("Failed to load usage.");
       } finally {
-        statsBtn.disabled = false;
-        statsBtn.textContent = "📊 My uploads";
+        refreshUsageBtn.disabled = false;
+      }
+    });
+
+    // ====== Manage tab ======
+    const videosBody = document.getElementById("videosBody");
+    const reloadVideosBtn = document.getElementById("reloadVideosBtn");
+    const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
+    const selectAllChk = document.getElementById("selectAllChk");
+
+    function formatBytes(b) {
+      if (!b) return "0 MB";
+      const mb = b / (1024 * 1024);
+      return `${mb.toFixed(1)} MB`;
+    }
+
+    function renderVideos(videos) {
+      videosBody.innerHTML = "";
+      videos.forEach(v => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><input type="checkbox" class="rowChk" data-id="${v.public_id}" /></td>
+          <td>
+            <div class="thumb">
+              <video src="${v.secure_url}" muted></video>
+            </div>
+          </td>
+          <td>${formatBytes(v.bytes)}</td>
+          <td>${v.created_at ? v.created_at.replace("T", " ").slice(0, 16) : ""}</td>
+        `;
+        videosBody.appendChild(tr);
+      });
+    }
+
+    reloadVideosBtn.addEventListener("click", async () => {
+      reloadVideosBtn.disabled = true;
+      try {
+        const res = await fetch(`${BACKEND_BASE_URL}/videos`);
+        const data = await res.json();
+        renderVideos(data.videos || []);
+      } catch (e) {
+        console.error(e);
+        alert("Failed to load videos.");
+      } finally {
+        reloadVideosBtn.disabled = false;
+        selectAllChk.checked = false;
+      }
+    });
+
+    selectAllChk.addEventListener("change", () => {
+      const chks = document.querySelectorAll(".rowChk");
+      chks.forEach(c => (c.checked = selectAllChk.checked));
+    });
+
+    deleteSelectedBtn.addEventListener("click", async () => {
+      const chks = Array.from(document.querySelectorAll(".rowChk"))
+        .filter(c => c.checked);
+      if (!chks.length) {
+        alert("No videos selected.");
+        return;
+      }
+      if (!confirm(`Delete ${chks.length} video(s) from Cloudinary? This cannot be undone.`)) {
+        return;
+      }
+      deleteSelectedBtn.disabled = true;
+      try {
+        const ids = chks.map(c => c.dataset.id);
+        const res = await fetch(`${BACKEND_BASE_URL}/delete`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids })
+        });
+        const data = await res.json();
+        if (data.error) {
+          alert("Delete failed: " + data.error);
+        } else {
+          // Remove deleted rows from table
+          chks.forEach(c => c.closest("tr").remove());
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Failed to delete videos.");
+      } finally {
+        deleteSelectedBtn.disabled = false;
+        selectAllChk.checked = false;
       }
     });
   </script>
