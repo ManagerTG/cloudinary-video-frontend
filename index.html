@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cloudinary Video Uploader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: #020617;
+      border-radius: 18px;
+      padding: 20px 18px 22px;
+      border: 1px solid #1f2937;
+      box-shadow: 0 22px 55px rgba(15, 23, 42, 0.9);
+      box-sizing: border-box;
+    }
+    h1 {
+      font-size: 1.25rem;
+      margin: 0 0 4px;
+      text-align: center;
+    }
+    .subtitle {
+      margin: 0 0 12px;
+      font-size: 0.8rem;
+      text-align: center;
+      color: #9ca3af;
+    }
+    .row { margin-bottom: 10px; }
+    label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      display: block;
+      margin-bottom: 4px;
+    }
+    input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      background: #020617;
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      color: #e5e7eb;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 9px 10px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.86rem;
+      font-weight: 600;
+      transition: transform 0.1s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+    .btn-main {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #022c22;
+      box-shadow: 0 12px 32px rgba(22, 163, 74, 0.6);
+    }
+    .btn-secondary {
+      background: #111827;
+      color: #e5e7eb;
+      border: 1px solid #1f2937;
+    }
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .btn:not(:disabled):active { transform: translateY(1px) scale(0.99); }
+    .status-box {
+      margin-top: 12px;
+      padding: 10px;
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      font-size: 0.8rem;
+    }
+    .status-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: #0f172a;
+      color: #9ca3af;
+    }
+    .progress {
+      margin-top: 6px;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: #020617;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      transition: width 0.2s ease-out;
+    }
+    .log {
+      margin-top: 10px;
+      max-height: 260px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+      border-top: 1px solid #111827;
+      padding-top: 8px;
+    }
+    .log-item {
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px dashed #1f2937;
+    }
+    .log-item:last-child { border-bottom: none; }
+    .log-url {
+      word-break: break-all;
+      color: #38bdf8;
+      text-decoration: none;
+    }
+    .log-url:hover { text-decoration: underline; }
+    .small {
+      font-size: 0.72rem;
+      color: #6b7280;
+      margin-top: 6px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Video Uploader</h1>
+    <p class="subtitle">Uploads videos from your phone to Cloudinary (25GB free plan).</p>
+
+    <div class="row">
+      <label for="fileInput">Choose one or more videos</label>
+      <input id="fileInput" type="file" accept="video/*" multiple />
+    </div>
+
+    <div class="btn-row">
+      <button id="uploadBtn" class="btn btn-main">⬆ Upload</button>
+      <button id="statsBtn" class="btn btn-secondary">📊 My uploads</button>
+    </div>
+
+    <div class="status-box">
+      <div class="status-top">
+        <span id="statusText">Idle. Select videos to start.</span>
+        <span id="counterBadge" class="badge">0 / 0</span>
+      </div>
+      <div class="progress">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <div class="small" id="globalCounterText">
+        Browser total uploaded: <span id="browserTotal">0</span> videos
+      </div>
+    </div>
+
+    <div class="log" id="log"></div>
+
+    <p class="small">
+      Uses direct unsigned upload. Protect your preset with size/format limits in Cloudinary settings.
+    </p>
+  </div>
+
+  <script>
+    // CONFIG – EDIT THESE 3 VALUES
+    const CLOUD_NAME = "dfnvpi7nh";          // your cloud name
+    const UPLOAD_PRESET = "telegram_upload"; // unsigned preset
+    const BACKEND_BASE_URL = "https://YOUR-BACKEND.onrender.com"; // after backend deploy
+
+    const fileInput = document.getElementById("fileInput");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const statsBtn  = document.getElementById("statsBtn");
+    const statusText = document.getElementById("statusText");
+    const counterBadge = document.getElementById("counterBadge");
+    const progressBar = document.getElementById("progressBar");
+    const log = document.getElementById("log");
+    const browserTotalEl = document.getElementById("browserTotal");
+    const globalCounterText = document.getElementById("globalCounterText");
+
+    const LS_KEY = "video_uploader_total";
+    let browserTotal = parseInt(localStorage.getItem(LS_KEY) || "0", 10);
+    browserTotalEl.textContent = browserTotal;
+
+    function saveBrowserTotal() {
+      localStorage.setItem(LS_KEY, String(browserTotal));
+      browserTotalEl.textContent = browserTotal;
+    }
+
+    function logMessage(text, url, ok = true) {
+      const item = document.createElement("div");
+      item.className = "log-item";
+      const icon = ok ? "✅" : "❌";
+      item.innerHTML = `
+        <div>${icon} ${text}</div>
+        ${url ? `<a class="log-url" href="${url}" target="_blank">${url}</a>` : ""}
+      `;
+      log.prepend(item);
+    }
+
+    async function uploadSingleFile(file, index, total) {
+      const endpoint = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`;
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", UPLOAD_PRESET);
+
+      statusText.textContent = `Uploading ${index + 1} of ${total}: ${file.name}`;
+
+      try {
+        const res = await fetch(endpoint, { method: "POST", body: formData });
+        if (!res.ok) {
+          const errText = await res.text();
+          console.error("Cloudinary error:", errText);
+          throw new Error(`HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        logMessage(`Uploaded: ${file.name}`, data.secure_url, true);
+        browserTotal += 1;
+        saveBrowserTotal();
+        return true;
+      } catch (err) {
+        console.error(err);
+        logMessage(`Failed: ${file.name} (${err.message})`, null, false);
+        return false;
+      }
+    }
+
+    uploadBtn.addEventListener("click", async () => {
+      const files = fileInput.files;
+      if (!files || files.length === 0) {
+        alert("Please select at least one video file.");
+        return;
+      }
+      if (!UPLOAD_PRESET) {
+        alert("Set your unsigned upload preset name in the code.");
+        return;
+      }
+
+      const total = files.length;
+      let okCount = 0;
+      uploadBtn.disabled = true;
+      statsBtn.disabled = true;
+      counterBadge.textContent = `0 / ${total}`;
+      progressBar.style.width = "0%";
+      statusText.textContent = `Starting upload of ${total} file(s)...`;
+
+      for (let i = 0; i < total; i++) {
+        const success = await uploadSingleFile(files[i], i, total);
+        if (success) okCount++;
+        const percent = Math.round(((i + 1) / total) * 100);
+        progressBar.style.width = percent + "%";
+        counterBadge.textContent = `${okCount} / ${total}`;
+      }
+
+      statusText.textContent =
+        okCount === total
+          ? `All files uploaded successfully (${okCount}/${total}).`
+          : `Finished with some errors (${okCount}/${total}).`;
+
+      uploadBtn.disabled = false;
+      statsBtn.disabled = false;
+    });
+
+    statsBtn.addEventListener("click", async () => {
+      if (!BACKEND_BASE_URL || BACKEND_BASE_URL.includes("YOUR-BACKEND")) {
+        alert("Deploy backend and set BACKEND_BASE_URL first.");
+        return;
+      }
+      statsBtn.disabled = true;
+      statsBtn.textContent = "⏳ Loading...";
+      try {
+        const res = await fetch(`${BACKEND_BASE_URL}/stats`);
+        const data = await res.json();
+        if (typeof data.total === "number") {
+          globalCounterText.textContent =
+            `Cloud total assets: ${data.total} • Browser uploaded: ${browserTotal}`;
+        } else {
+          alert("Backend /stats returned invalid data.");
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Failed to load stats from backend.");
+      } finally {
+        statsBtn.disabled = false;
+        statsBtn.textContent = "📊 My uploads";
+      }
+    });
+  </script>
+</body>
+</html>
