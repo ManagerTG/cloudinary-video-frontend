@@ -2,136 +2,173 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Cloudinary Video Manager</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Video Uploader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <style>
     :root {
-      --bg: #020617;
-      --panel: #020617;
+      --bg: #0a0e1a;
+      --panel: #131a2e;
       --border: #1f2937;
       --accent: #22c55e;
       --accent-dark: #16a34a;
       --text: #e5e7eb;
       --muted: #9ca3af;
-      --danger: #f97373;
+      --danger: #ef4444;
     }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #0f172a 0, #020617 55%, #000 100%);
+      background: linear-gradient(180deg, #0a0e1a 0%, #020617 100%);
       color: var(--text);
-      margin: 0;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
+      padding: 0;
+      overflow-x: hidden;
     }
-    .shell {
-      width: 100%;
-      max-width: 900px;
-      background: rgba(15, 23, 42, 0.95);
-      border-radius: 20px;
-      border: 1px solid #111827;
-      box-shadow: 0 24px 65px rgba(0, 0, 0, 0.85);
-      overflow: hidden;
-    }
+    
+    /* Header */
     header {
-      padding: 12px 18px;
-      border-bottom: 1px solid #111827;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 14px 16px;
+      background: rgba(19, 26, 46, 0.95);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
     }
     header h1 {
-      font-size: 1.05rem;
-      margin: 0;
+      font-size: 1.1rem;
+      margin-bottom: 2px;
     }
-    header span {
-      font-size: 0.7rem;
+    .subtitle {
+      font-size: 0.72rem;
       color: var(--muted);
     }
     .chip {
-      padding: 2px 8px;
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      padding: 3px 10px;
       border-radius: 999px;
       font-size: 0.7rem;
       background: #0f172a;
       color: var(--muted);
     }
-    main { display: flex; min-height: 420px; }
 
-    .sidebar {
-      width: 150px;
-      border-right: 1px solid #111827;
-      background: #020617;
-      padding: 10px 8px;
+    /* Lock screen */
+    #lockView {
+      padding: 40px 20px;
+      text-align: center;
+      max-width: 400px;
+      margin: 60px auto;
+    }
+    #lockView h2 { font-size: 1.2rem; margin-bottom: 8px; }
+    #lockView p { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; }
+    #lockView input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+
+    /* Main container */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    /* Bottom nav tabs (mobile style) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(19, 26, 46, 0.98);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+    .nav-btn {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-    }
-    .tab-btn {
-      width: 100%;
-      padding: 8px 10px;
-      font-size: 0.8rem;
-      border-radius: 10px;
-      border: 1px solid transparent;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 4px;
+      border: none;
       background: transparent;
       color: var(--muted);
-      text-align: left;
+      font-size: 0.7rem;
       cursor: pointer;
-      display: flex;
-      gap: 6px;
-      align-items: center;
+      transition: color 0.2s ease;
     }
-    .tab-btn.active {
-      background: #0b1120;
-      border-color: #1f2937;
-      color: var(--text);
-    }
+    .nav-btn.active { color: var(--accent); }
+    .nav-icon { font-size: 1.4rem; }
 
+    /* Content sections */
     .content {
-      flex: 1;
-      padding: 14px 16px 16px;
-      background: #020617;
+      padding-bottom: 80px; /* space for bottom nav */
     }
-    .hidden { display: none; }
+    section { display: none; }
+    section.active { display: block; }
 
-    .row { margin-bottom: 10px; }
+    .card {
+      background: var(--panel);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .card h3 { font-size: 0.95rem; margin-bottom: 6px; }
+    .card p { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }
+
+    /* Form elements */
     label {
       font-size: 0.8rem;
       color: var(--muted);
       display: block;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
-    input[type="file"], input[type="password"] {
+    input[type="file"] {
       width: 100%;
-      padding: 8px;
-      border-radius: 10px;
+      padding: 12px;
+      border-radius: 12px;
       border: 1px solid var(--border);
-      background: #020617;
+      background: #0a0e1a;
       color: var(--text);
       font-size: 0.9rem;
+      margin-bottom: 10px;
     }
+
+    /* Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      padding: 8px 12px;
-      border-radius: 999px;
+      gap: 6px;
+      padding: 12px 18px;
+      border-radius: 12px;
       border: none;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       font-weight: 600;
-      transition: transform 0.1s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      width: 100%;
+      transition: transform 0.1s ease, opacity 0.15s ease;
     }
     .btn-main {
       background: linear-gradient(135deg, var(--accent), var(--accent-dark));
       color: #022c22;
-      box-shadow: 0 10px 28px rgba(34, 197, 94, 0.65);
+      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4);
     }
     .btn-secondary {
-      background: #111827;
+      background: #1f2937;
       color: var(--text);
       border: 1px solid var(--border);
     }
@@ -140,27 +177,35 @@
       color: #fee2e2;
       border: 1px solid #b91c1c;
     }
-    .btn:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
-    .btn:not(:disabled):active { transform: translateY(1px) scale(0.99); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn:active:not(:disabled) { transform: scale(0.98); }
 
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .btn-group .btn { flex: 1; }
+
+    /* Status box */
     .status-box {
-      margin-top: 8px;
-      padding: 9px;
+      background: #0a0e1a;
       border-radius: 12px;
       border: 1px solid var(--border);
-      background: #020617;
-      font-size: 0.78rem;
+      padding: 12px;
+      margin-top: 10px;
     }
-    .status-top {
+    .status-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
     }
     .badge {
-      padding: 2px 8px;
+      padding: 2px 10px;
       border-radius: 999px;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       background: #0f172a;
       color: var(--muted);
     }
@@ -170,206 +215,214 @@
       border-radius: 999px;
       background: #020617;
       overflow: hidden;
-      margin-top: 6px;
+      margin: 8px 0;
     }
     .progress-bar {
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--accent), var(--accent-dark));
-      transition: width 0.2s ease-out;
+      transition: width 0.3s ease-out;
     }
-
     .usage-bar {
-      margin-top: 6px;
       width: 100%;
       height: 8px;
       border-radius: 999px;
       background: #020617;
       overflow: hidden;
-      border: 1px solid #1f2937;
+      border: 1px solid var(--border);
+      margin: 8px 0;
     }
     .usage-fill {
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, #38bdf8, #22c55e);
-      transition: width 0.25s ease-out;
+      transition: width 0.3s ease-out;
     }
 
+    /* Log */
     .log {
-      margin-top: 10px;
-      max-height: 210px;
+      max-height: 200px;
       overflow-y: auto;
       font-size: 0.78rem;
-      border-top: 1px solid #111827;
-      padding-top: 6px;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
     }
     .log-item {
-      margin-bottom: 5px;
-      padding-bottom: 4px;
-      border-bottom: 1px dashed #1f2937;
+      margin-bottom: 6px;
+      padding: 6px;
+      background: #0a0e1a;
+      border-radius: 6px;
     }
     .log-url {
       word-break: break-all;
       color: #38bdf8;
       text-decoration: none;
+      font-size: 0.72rem;
     }
-    .log-url:hover { text-decoration: underline; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.78rem;
+    /* Table for manage */
+    .video-list {
+      max-height: 400px;
+      overflow-y: auto;
     }
-    th, td {
-      padding: 4px 6px;
-      border-bottom: 1px solid #111827;
-      text-align: left;
+    .video-item {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      background: #0a0e1a;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      align-items: center;
     }
-    th { color: var(--muted); font-weight: 500; }
-    tbody tr:nth-child(even) { background: #020617; }
-
-    .thumb {
+    .video-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .video-thumb {
       width: 80px;
       height: 45px;
-      background: #020617;
       border-radius: 6px;
       overflow: hidden;
+      background: #020617;
+      flex-shrink: 0;
     }
-    .thumb video {
+    .video-thumb video {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-
-    #lockView {
-      padding: 22px 18px 26px;
-      text-align: center;
+    .video-info {
+      flex: 1;
+      font-size: 0.75rem;
     }
-    #lockView h2 { margin: 0 0 6px; font-size: 1.05rem; }
-    #lockView p { margin: 0 0 14px; font-size: 0.78rem; color: var(--muted); }
+    .video-info .size {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .video-info .date {
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .hidden { display: none !important; }
+    .text-center { text-align: center; }
+    .text-muted { color: var(--muted); font-size: 0.72rem; margin-top: 6px; }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <header>
-      <div>
-        <h1>Cloud Video Dashboard</h1>
-        <span>Private uploader for Cloudinary (Reels folder, 25GB free)</span>
-      </div>
-      <span class="chip" id="authChip">Locked</span>
-    </header>
+  <header>
+    <h1>Video Uploader</h1>
+    <p class="subtitle">Upload to Cloudinary (Reels folder)</p>
+    <span class="chip" id="authChip">Locked</span>
+  </header>
 
-    <!-- Lock screen -->
-    <div id="lockView">
-      <h2>Enter Access Code</h2>
-      <p>This site is private. Enter your daily access code to continue.</p>
-      <div class="row">
-        <input id="accessInput" type="password" placeholder="Access code" />
-      </div>
-      <button id="unlockBtn" class="btn btn-main">Unlock</button>
-      <p style="margin-top:8px;font-size:0.72rem;color:#6b7280;">
-        You will stay unlocked for 24 hours on this device.
-      </p>
-    </div>
+  <!-- Lock screen -->
+  <div id="lockView">
+    <h2>🔐 Enter Access Code</h2>
+    <p>This site is private. Enter your daily access code.</p>
+    <input id="accessInput" type="password" placeholder="Access code" />
+    <button id="unlockBtn" class="btn btn-main">Unlock</button>
+    <p class="text-muted">You stay unlocked for 24 hours on this device.</p>
+  </div>
 
-    <!-- App UI -->
-    <main id="appView" class="hidden">
-      <div class="sidebar">
-        <button class="tab-btn active" data-tab="uploadTab">⬆ Upload</button>
-        <button class="tab-btn" data-tab="usageTab">📊 Usage</button>
-        <button class="tab-btn" data-tab="manageTab">🗂 Manage</button>
-      </div>
-
-      <div class="content">
-        <!-- Upload tab -->
-        <section id="uploadTab">
-          <div class="row">
-            <label for="fileInput">Select one or more videos</label>
-            <input id="fileInput" type="file" accept="video/*" multiple />
-          </div>
-
-          <div style="display:flex; gap:8px; margin-top:6px;">
-            <button id="uploadBtn" class="btn btn-main" style="flex:2;">⬆ Upload</button>
-            <button id="statsBtn" class="btn btn-secondary" style="flex:1;">ℹ Stats</button>
+  <!-- Main app -->
+  <div id="appView" class="hidden">
+    <div class="container content">
+      
+      <!-- Upload tab -->
+      <section id="uploadTab" class="active">
+        <div class="card">
+          <label for="fileInput">Select videos to upload</label>
+          <input id="fileInput" type="file" accept="video/*" multiple />
+          
+          <div class="btn-group">
+            <button id="uploadBtn" class="btn btn-main">⬆ Upload</button>
+            <button id="statsBtn" class="btn btn-secondary">ℹ Stats</button>
           </div>
 
           <div class="status-box">
-            <div class="status-top">
-              <span id="statusText">Idle. Select videos to start.</span>
+            <div class="status-row">
+              <span id="statusText">Ready. Select videos.</span>
               <span id="counterBadge" class="badge">0 / 0</span>
             </div>
             <div class="progress">
               <div id="progressBar" class="progress-bar"></div>
             </div>
-            <div style="margin-top:4px;font-size:0.72rem;color:#6b7280;">
-              Browser total uploaded: <span id="browserTotal">0</span> videos
-            </div>
+            <p class="text-muted">Browser uploaded: <span id="browserTotal">0</span> videos</p>
           </div>
 
           <div class="log" id="log"></div>
-        </section>
+        </div>
+      </section>
 
-        <!-- Usage tab -->
-        <section id="usageTab" class="hidden">
-          <h3 style="margin:0 0 6px;font-size:0.9rem;">Storage usage</h3>
-          <p style="margin:0 0 8px;font-size:0.78rem;color:#9ca3af;">
-            Shows approximate Cloudinary storage used out of your 25 GB target.
-          </p>
-          <button id="refreshUsageBtn" class="btn btn-secondary" style="margin-bottom:8px;">
-            🔄 Refresh usage
-          </button>
+      <!-- Usage tab -->
+      <section id="usageTab">
+        <div class="card">
+          <h3>📊 Storage Usage</h3>
+          <p>Shows your Cloudinary storage used (free 25 GB plan).</p>
+          <button id="refreshUsageBtn" class="btn btn-secondary">🔄 Refresh usage</button>
           <div class="status-box">
-            <div class="status-top">
-              <span id="usageText">Usage not loaded yet.</span>
-            </div>
+            <p id="usageText" style="font-size:0.8rem;margin-bottom:6px;">Usage not loaded yet.</p>
             <div class="usage-bar">
               <div id="usageFill" class="usage-fill"></div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- Manage tab -->
-        <section id="manageTab" class="hidden">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <h3 style="margin:0;font-size:0.9rem;">Manage videos in Reels</h3>
-            <button id="reloadVideosBtn" class="btn btn-secondary">🔄 Reload</button>
+      <!-- Manage tab -->
+      <section id="manageTab">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <h3>🗂 Manage Videos</h3>
+            <button id="reloadVideosBtn" class="btn btn-secondary" style="width:auto;padding:8px 14px;">Reload</button>
           </div>
-          <p style="margin:0 0 6px;font-size:0.76rem;color:#9ca3af;">
-            Select videos and delete them from Cloudinary directly (this cannot be undone).
-          </p>
+          <p>Select videos and delete from Cloudinary (cannot be undone).</p>
+          
+          <div style="margin-bottom:8px;">
+            <label style="display:inline-flex;align-items:center;gap:6px;margin-bottom:8px;">
+              <input type="checkbox" id="selectAllChk" style="width:18px;height:18px;" />
+              <span style="font-size:0.8rem;">Select all</span>
+            </label>
+          </div>
 
-          <div style="margin-bottom:6px;">
-            <button id="deleteSelectedBtn" class="btn btn-danger">🗑 Delete selected</button>
-          </div>
+          <button id="deleteSelectedBtn" class="btn btn-danger" style="margin-bottom:10px;">🗑 Delete selected</button>
 
-          <div style="max-height:260px;overflow-y:auto;border:1px solid #111827;border-radius:10px;">
-            <table>
-              <thead>
-                <tr>
-                  <th><input type="checkbox" id="selectAllChk" /></th>
-                  <th>Preview</th>
-                  <th>Size</th>
-                  <th>Created</th>
-                </tr>
-              </thead>
-              <tbody id="videosBody"></tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-    </main>
+          <div class="video-list" id="videoList"></div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Bottom navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-tab="uploadTab">
+        <span class="nav-icon">⬆</span>
+        <span>Upload</span>
+      </button>
+      <button class="nav-btn" data-tab="usageTab">
+        <span class="nav-icon">📊</span>
+        <span>Usage</span>
+      </button>
+      <button class="nav-btn" data-tab="manageTab">
+        <span class="nav-icon">🗂</span>
+        <span>Manage</span>
+      </button>
+    </nav>
   </div>
 
   <script>
-    // ====== CONFIG ======
+    // CONFIG
     const CLOUD_NAME = "dfnvpi7nh";
     const UPLOAD_PRESET = "telegram_upload";
     const BACKEND_BASE_URL = "https://cloudinary-video-backend.onrender.com";
-    const ACCESS_CODE = "3807"; // change if you want
+    const ACCESS_CODE = "912734";
     const UNLOCK_HOURS = 24;
     const STORAGE_LIMIT_GB = 25;
-    // ====================
 
+    // Lock/unlock
     const lockView = document.getElementById("lockView");
     const appView = document.getElementById("appView");
     const accessInput = document.getElementById("accessInput");
@@ -381,12 +434,9 @@
       if (!raw) return false;
       try {
         const obj = JSON.parse(raw);
-        const ts = obj.ts;
-        const diffH = (Date.now() - ts) / (1000 * 60 * 60);
+        const diffH = (Date.now() - obj.ts) / (1000 * 60 * 60);
         return diffH < UNLOCK_HOURS;
-      } catch {
-        return false;
-      }
+      } catch { return false; }
     }
 
     function setUnlocked() {
@@ -407,7 +457,7 @@
 
     unlockBtn.addEventListener("click", () => {
       const val = accessInput.value.trim();
-      if (!val) return alert("Enter access code.");
+      if (!val) return alert("Enter code.");
       if (val === ACCESS_CODE) {
         setUnlocked();
         updateAuthView();
@@ -419,23 +469,40 @@
 
     updateAuthView();
 
-    // Upload tab
+    // Tab navigation
+    const navBtns = document.querySelectorAll(".nav-btn");
+    const sections = {
+      uploadTab: document.getElementById("uploadTab"),
+      usageTab: document.getElementById("usageTab"),
+      manageTab: document.getElementById("manageTab")
+    };
+
+    navBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.tab;
+        Object.keys(sections).forEach(k => {
+          sections[k].classList.toggle("active", k === target);
+        });
+        navBtns.forEach(b => b.classList.toggle("active", b === btn));
+      });
+    });
+
+    // Upload
     const fileInput = document.getElementById("fileInput");
     const uploadBtn = document.getElementById("uploadBtn");
-    const statsBtn  = document.getElementById("statsBtn");
+    const statsBtn = document.getElementById("statsBtn");
     const statusText = document.getElementById("statusText");
     const counterBadge = document.getElementById("counterBadge");
     const progressBar = document.getElementById("progressBar");
     const log = document.getElementById("log");
     const browserTotalEl = document.getElementById("browserTotal");
-    const globalCounterText = document.getElementById("globalCounterText");
 
-    const LS_TOTAL_KEY = "video_uploader_total";
-    let browserTotal = parseInt(localStorage.getItem(LS_TOTAL_KEY) || "0", 10);
+    const LS_KEY = "video_uploader_total";
+    let browserTotal = parseInt(localStorage.getItem(LS_KEY) || "0", 10);
     browserTotalEl.textContent = browserTotal;
 
     function saveBrowserTotal() {
-      localStorage.setItem(LS_TOTAL_KEY, String(browserTotal));
+      localStorage.setItem(LS_KEY, String(browserTotal));
       browserTotalEl.textContent = browserTotal;
     }
 
@@ -455,37 +522,25 @@
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", UPLOAD_PRESET);
-      statusText.textContent = `Uploading ${index + 1} of ${total}: ${file.name}`;
+      statusText.textContent = `Uploading ${index + 1}/${total}: ${file.name.slice(0, 20)}...`;
 
       try {
         const res = await fetch(endpoint, { method: "POST", body: formData });
-        if (!res.ok) {
-          const errText = await res.text();
-          console.error("Cloudinary error:", errText);
-          throw new Error(`HTTP ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        logMessage(`Uploaded: ${file.name}`, data.secure_url, true);
+        logMessage(`${file.name}`, data.secure_url, true);
         browserTotal += 1;
         saveBrowserTotal();
         return true;
       } catch (err) {
-        console.error(err);
-        logMessage(`Failed: ${file.name} (${err.message})`, null, false);
+        logMessage(`${file.name} failed`, null, false);
         return false;
       }
     }
 
     uploadBtn.addEventListener("click", async () => {
       const files = fileInput.files;
-      if (!files || files.length === 0) {
-        alert("Please select at least one video file.");
-        return;
-      }
-      if (!UPLOAD_PRESET) {
-        alert("Set your unsigned upload preset name in the code.");
-        return;
-      }
+      if (!files || !files.length) return alert("Select videos.");
 
       const total = files.length;
       let okCount = 0;
@@ -493,21 +548,16 @@
       statsBtn.disabled = true;
       counterBadge.textContent = `0 / ${total}`;
       progressBar.style.width = "0%";
-      statusText.textContent = `Starting upload of ${total} file(s)...`;
 
       for (let i = 0; i < total; i++) {
-        const success = await uploadSingleFile(files[i], i, total);
-        if (success) okCount++;
-        const percent = Math.round(((i + 1) / total) * 100);
-        progressBar.style.width = percent + "%";
+        const ok = await uploadSingleFile(files[i], i, total);
+        if (ok) okCount++;
+        progressBar.style.width = `${Math.round(((i + 1) / total) * 100)}%`;
         counterBadge.textContent = `${okCount} / ${total}`;
       }
 
       statusText.textContent =
-        okCount === total
-          ? `All files uploaded successfully (${okCount}/${total}).`
-          : `Finished with some errors (${okCount}/${total}).`;
-
+        okCount === total ? `All done (${okCount}/${total})` : `Done with errors (${okCount}/${total})`;
       uploadBtn.disabled = false;
       statsBtn.disabled = false;
     });
@@ -517,36 +567,14 @@
         const res = await fetch(`${BACKEND_BASE_URL}/stats`);
         const data = await res.json();
         if (typeof data.total === "number") {
-          globalCounterText.textContent =
-            `Cloud total assets: ${data.total} • Browser uploaded: ${browserTotal}`;
-        } else {
-          alert("Backend /stats returned invalid data.");
+          alert(`Cloud total: ${data.total} videos\nBrowser uploaded: ${browserTotal}`);
         }
       } catch (e) {
-        console.error(e);
-        alert("Failed to load stats from backend.");
+        alert("Failed to load stats.");
       }
     });
 
-    // Tabs
-    const tabButtons = document.querySelectorAll(".tab-btn");
-    const tabs = {
-      uploadTab: document.getElementById("uploadTab"),
-      usageTab: document.getElementById("usageTab"),
-      manageTab: document.getElementById("manageTab")
-    };
-
-    tabButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const target = btn.dataset.tab;
-        Object.keys(tabs).forEach(k => {
-          tabs[k].classList.toggle("hidden", k !== target);
-        });
-        tabButtons.forEach(b => b.classList.toggle("active", b === btn));
-      });
-    });
-
-    // Usage tab
+    // Usage
     const refreshUsageBtn = document.getElementById("refreshUsageBtn");
     const usageText = document.getElementById("usageText");
     const usageFill = document.getElementById("usageFill");
@@ -562,43 +590,41 @@
         usageFill.style.width = `${percent.toFixed(1)}%`;
         const left = Math.max(0, limit - used);
         usageText.textContent =
-          `Used ${used.toFixed(2)} GB of ${limit} GB (${percent.toFixed(1)}%). ` +
-          `Approx left: ${left.toFixed(2)} GB.`;
+          `Used ${used.toFixed(2)} GB of ${limit} GB (${percent.toFixed(1)}%). Left: ${left.toFixed(2)} GB.`;
       } catch (e) {
-        console.error(e);
         alert("Failed to load usage.");
       } finally {
         refreshUsageBtn.disabled = false;
       }
     });
 
-    // Manage tab
-    const videosBody = document.getElementById("videosBody");
+    // Manage
+    const videoList = document.getElementById("videoList");
     const reloadVideosBtn = document.getElementById("reloadVideosBtn");
     const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
     const selectAllChk = document.getElementById("selectAllChk");
 
     function formatBytes(b) {
-      if (!b) return "0 MB";
       const mb = b / (1024 * 1024);
       return `${mb.toFixed(1)} MB`;
     }
 
     function renderVideos(videos) {
-      videosBody.innerHTML = "";
+      videoList.innerHTML = "";
       videos.forEach(v => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><input type="checkbox" class="rowChk" data-id="${v.public_id}" /></td>
-          <td>
-            <div class="thumb">
-              <video src="${v.secure_url}" muted></video>
-            </div>
-          </td>
-          <td>${formatBytes(v.bytes)}</td>
-          <td>${v.created_at ? v.created_at.replace("T", " ").slice(0, 16) : ""}</td>
+        const div = document.createElement("div");
+        div.className = "video-item";
+        div.innerHTML = `
+          <input type="checkbox" class="rowChk" data-id="${v.public_id}" />
+          <div class="video-thumb">
+            <video src="${v.secure_url}" muted></video>
+          </div>
+          <div class="video-info">
+            <div class="size">${formatBytes(v.bytes)}</div>
+            <div class="date">${v.created_at ? v.created_at.slice(0, 16).replace("T", " ") : ""}</div>
+          </div>
         `;
-        videosBody.appendChild(tr);
+        videoList.appendChild(div);
       });
     }
 
@@ -609,7 +635,6 @@
         const data = await res.json();
         renderVideos(data.videos || []);
       } catch (e) {
-        console.error(e);
         alert("Failed to load videos.");
       } finally {
         reloadVideosBtn.disabled = false;
@@ -618,20 +643,14 @@
     });
 
     selectAllChk.addEventListener("change", () => {
-      const chks = document.querySelectorAll(".rowChk");
-      chks.forEach(c => (c.checked = selectAllChk.checked));
+      document.querySelectorAll(".rowChk").forEach(c => (c.checked = selectAllChk.checked));
     });
 
     deleteSelectedBtn.addEventListener("click", async () => {
-      const chks = Array.from(document.querySelectorAll(".rowChk"))
-        .filter(c => c.checked);
-      if (!chks.length) {
-        alert("No videos selected.");
-        return;
-      }
-      if (!confirm(`Delete ${chks.length} video(s) from Cloudinary? This cannot be undone.`)) {
-        return;
-      }
+      const chks = Array.from(document.querySelectorAll(".rowChk")).filter(c => c.checked);
+      if (!chks.length) return alert("No videos selected.");
+      if (!confirm(`Delete ${chks.length} video(s)? Cannot be undone.`)) return;
+
       deleteSelectedBtn.disabled = true;
       try {
         const ids = chks.map(c => c.dataset.id);
@@ -644,11 +663,10 @@
         if (data.error) {
           alert("Delete failed: " + data.error);
         } else {
-          chks.forEach(c => c.closest("tr").remove());
+          chks.forEach(c => c.closest(".video-item").remove());
         }
       } catch (e) {
-        console.error(e);
-        alert("Failed to delete videos.");
+        alert("Failed to delete.");
       } finally {
         deleteSelectedBtn.disabled = false;
         selectAllChk.checked = false;
