@@ -14,6 +14,7 @@
       --text: #e5e7eb;
       --muted: #9ca3af;
       --danger: #ef4444;
+      --warning: #f59e0b;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -25,7 +26,6 @@
       overflow-x: hidden;
     }
     
-    /* Header */
     header {
       padding: 14px 16px;
       background: rgba(19, 26, 46, 0.95);
@@ -54,7 +54,6 @@
       color: var(--muted);
     }
 
-    /* Lock screen */
     #lockView {
       padding: 40px 20px;
       text-align: center;
@@ -74,14 +73,12 @@
       margin-bottom: 12px;
     }
 
-    /* Main container */
     .container {
       max-width: 600px;
       margin: 0 auto;
       padding: 12px;
     }
 
-    /* Bottom nav tabs (mobile style) */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -112,9 +109,8 @@
     .nav-btn.active { color: var(--accent); }
     .nav-icon { font-size: 1.4rem; }
 
-    /* Content sections */
     .content {
-      padding-bottom: 80px; /* space for bottom nav */
+      padding-bottom: 80px;
     }
     section { display: none; }
     section.active { display: block; }
@@ -129,7 +125,6 @@
     .card h3 { font-size: 0.95rem; margin-bottom: 6px; }
     .card p { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }
 
-    /* Form elements */
     label {
       font-size: 0.8rem;
       color: var(--muted);
@@ -147,7 +142,6 @@
       margin-bottom: 10px;
     }
 
-    /* Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -177,6 +171,11 @@
       color: #fee2e2;
       border: 1px solid #b91c1c;
     }
+    .btn-warning {
+      background: #78350f;
+      color: #fef3c7;
+      border: 1px solid #92400e;
+    }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn:active:not(:disabled) { transform: scale(0.98); }
 
@@ -187,7 +186,6 @@
     }
     .btn-group .btn { flex: 1; }
 
-    /* Status box */
     .status-box {
       background: #0a0e1a;
       border-radius: 12px;
@@ -239,7 +237,6 @@
       transition: width 0.3s ease-out;
     }
 
-    /* Log */
     .log {
       max-height: 200px;
       overflow-y: auto;
@@ -261,7 +258,6 @@
       font-size: 0.72rem;
     }
 
-    /* Table for manage */
     .video-list {
       max-height: 400px;
       overflow-y: auto;
@@ -318,7 +314,6 @@
     <span class="chip" id="authChip">Locked</span>
   </header>
 
-  <!-- Lock screen -->
   <div id="lockView">
     <h2>🔐 Enter Access Code</h2>
     <p>This site is private. Enter your daily access code.</p>
@@ -327,11 +322,9 @@
     <p class="text-muted">You stay unlocked for 24 hours on this device.</p>
   </div>
 
-  <!-- Main app -->
   <div id="appView" class="hidden">
     <div class="container content">
       
-      <!-- Upload tab -->
       <section id="uploadTab" class="active">
         <div class="card">
           <label for="fileInput">Select videos to upload</label>
@@ -357,7 +350,6 @@
         </div>
       </section>
 
-      <!-- Usage tab -->
       <section id="usageTab">
         <div class="card">
           <h3>📊 Storage Usage</h3>
@@ -372,7 +364,6 @@
         </div>
       </section>
 
-      <!-- Manage tab -->
       <section id="manageTab">
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
@@ -388,7 +379,10 @@
             </label>
           </div>
 
-          <button id="deleteSelectedBtn" class="btn btn-danger" style="margin-bottom:10px;">🗑 Delete selected</button>
+          <div class="btn-group" style="margin-bottom:10px;">
+            <button id="deleteSelectedBtn" class="btn btn-danger">🗑 Delete selected</button>
+            <button id="deleteOldBtn" class="btn btn-warning">⏰ Delete 7+ days old</button>
+          </div>
 
           <div class="video-list" id="videoList"></div>
         </div>
@@ -396,7 +390,6 @@
 
     </div>
 
-    <!-- Bottom navigation -->
     <nav class="bottom-nav">
       <button class="nav-btn active" data-tab="uploadTab">
         <span class="nav-icon">⬆</span>
@@ -414,7 +407,6 @@
   </div>
 
   <script>
-    // CONFIG
     const CLOUD_NAME = "dfnvpi7nh";
     const UPLOAD_PRESET = "telegram_upload";
     const BACKEND_BASE_URL = "https://cloudinary-video-backend.onrender.com";
@@ -422,7 +414,6 @@
     const UNLOCK_HOURS = 24;
     const STORAGE_LIMIT_GB = 25;
 
-    // Lock/unlock
     const lockView = document.getElementById("lockView");
     const appView = document.getElementById("appView");
     const accessInput = document.getElementById("accessInput");
@@ -469,7 +460,6 @@
 
     updateAuthView();
 
-    // Tab navigation
     const navBtns = document.querySelectorAll(".nav-btn");
     const sections = {
       uploadTab: document.getElementById("uploadTab"),
@@ -487,7 +477,6 @@
       });
     });
 
-    // Upload
     const fileInput = document.getElementById("fileInput");
     const uploadBtn = document.getElementById("uploadBtn");
     const statsBtn = document.getElementById("statsBtn");
@@ -574,7 +563,6 @@
       }
     });
 
-    // Usage
     const refreshUsageBtn = document.getElementById("refreshUsageBtn");
     const usageText = document.getElementById("usageText");
     const usageFill = document.getElementById("usageFill");
@@ -598,11 +586,13 @@
       }
     });
 
-    // Manage
     const videoList = document.getElementById("videoList");
     const reloadVideosBtn = document.getElementById("reloadVideosBtn");
     const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
+    const deleteOldBtn = document.getElementById("deleteOldBtn");
     const selectAllChk = document.getElementById("selectAllChk");
+
+    let allVideos = []; // store loaded videos globally
 
     function formatBytes(b) {
       const mb = b / (1024 * 1024);
@@ -610,10 +600,12 @@
     }
 
     function renderVideos(videos) {
+      allVideos = videos; // save for bulk actions
       videoList.innerHTML = "";
       videos.forEach(v => {
         const div = document.createElement("div");
         div.className = "video-item";
+        div.dataset.created = v.created_at; // store timestamp for filtering
         div.innerHTML = `
           <input type="checkbox" class="rowChk" data-id="${v.public_id}" />
           <div class="video-thumb">
@@ -664,11 +656,62 @@
           alert("Delete failed: " + data.error);
         } else {
           chks.forEach(c => c.closest(".video-item").remove());
+          alert(`Deleted ${chks.length} video(s) successfully.`);
         }
       } catch (e) {
         alert("Failed to delete.");
       } finally {
         deleteSelectedBtn.disabled = false;
+        selectAllChk.checked = false;
+      }
+    });
+
+    // NEW: Delete videos older than 7 days
+    deleteOldBtn.addEventListener("click", async () => {
+      if (!allVideos.length) {
+        return alert("Load videos first by clicking Reload.");
+      }
+
+      const now = new Date();
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+      const oldVideos = allVideos.filter(v => {
+        if (!v.created_at) return false;
+        const createdDate = new Date(v.created_at);
+        return createdDate < sevenDaysAgo;
+      });
+
+      if (!oldVideos.length) {
+        return alert("No videos older than 7 days found.");
+      }
+
+      if (!confirm(`Delete ${oldVideos.length} video(s) older than 7 days? This cannot be undone.`)) {
+        return;
+      }
+
+      deleteOldBtn.disabled = true;
+      try {
+        const ids = oldVideos.map(v => v.public_id);
+        const res = await fetch(`${BACKEND_BASE_URL}/delete`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids })
+        });
+        const data = await res.json();
+        if (data.error) {
+          alert("Delete failed: " + data.error);
+        } else {
+          // Remove deleted items from UI
+          ids.forEach(id => {
+            const item = document.querySelector(`[data-id="${id}"]`)?.closest(".video-item");
+            if (item) item.remove();
+          });
+          alert(`Deleted ${oldVideos.length} old video(s) successfully.`);
+        }
+      } catch (e) {
+        alert("Failed to delete old videos.");
+      } finally {
+        deleteOldBtn.disabled = false;
         selectAllChk.checked = false;
       }
     });
